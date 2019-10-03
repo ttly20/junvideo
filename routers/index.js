@@ -39,14 +39,15 @@ module.exports = app => {
     // video sort query
     ROUTER.get("/sort/:type/:page", async (req, res) => {
         let list
-        if (req.params.page > 500) return res.status(204)
+        page = parseInt(req.params.page)
+        if (page > 500) return res.status(204)
             .send({ message: "Sorry!No " + req.params.type + " content found!" })
-        if (req.params.page == 1)
+        if (page == 1)
             list = await VIDEOS.find({ type: req.params.type })
                 .sort({ update: -1 }).limit(10).exec()
         else
             list = await VIDEOS.find({ type: req.params.type })
-                .skip((req.params.page - 1) * 10).sort({ update: -1 }).limit(10).exec()
+                .skip((page - 1) * 10).sort({ update: -1 }).limit(10).exec()
         res.send(list)
     })
 
@@ -61,14 +62,15 @@ module.exports = app => {
     // video actor query
     ROUTER.get("/actor/:actor/:page", async (req, res) => {
         let list
-        if (req.params.page > 500) return res.status(204)
+        page = parseInt(req.params.page)
+        if (page > 500) return res.status(204)
             .send({ message: "Sorry!Did not find " + req.params.actor + " content!" })
-        if (req.params.page == 1)
+        if (page == 1)
             list = await VIDEOS.find({ actor: req.params.actor })
-                .skip(req.params.page).sort({ update: -1 }).limit(10).exec()
+                .skip(page).sort({ update: -1 }).limit(10).exec()
         else
             list = await VIDEOS.find({ actor: req.params.actor })
-                .skip((req.params.page - 1) * 10).sort({ update: -1 }).limit(10).exec()
+                .skip((page - 1) * 10).sort({ update: -1 }).limit(10).exec()
         res.send(list)
     })
 
@@ -83,14 +85,15 @@ module.exports = app => {
     // video language query
     ROUTER.get("/language/:language/:page", async (req, res) => {
         let list
-        if (req.params.page > 500) return res.status(204)
+        page = parseInt(req.params.page)
+        if (page > 500) return res.status(204)
             .send({ message: "Sorry!No " + req.params.language + " content found!" })
-        if (req.params.page == 1)
+        if (page == 1)
             list = await VIDEOS.find({ language: req.params.language })
-                .skip(req.params.page).sort({ update: -1 }).limit(10).exec()
+                .skip(page).sort({ update: -1 }).limit(10).exec()
         else
             list = await VIDEOS.find({ language: req.params.language })
-                .skip((req.params.page - 1) * 10).sort({ update: -1 }).limit(10).exec()
+                .skip((page - 1) * 10).sort({ update: -1 }).limit(10).exec()
     })
 
     // video date
@@ -104,14 +107,15 @@ module.exports = app => {
     // video date query
     ROUTER.get("/date/:date/:page", async (req, res) => {
         let list
-        if (req.params.page > 500) return res.status(204)
+        page = parseInt(req.params.page)
+        if (page > 500) return res.status(204)
             .send({ message: "Sorry!Didn't find the content of " + req.params.date })
-        if (req.params.page == 1)
+        if (page == 1)
             list = await VIDEOS.find({ released: req.params.date })
                 .skip(req.params.page).sort({ update: -1 }).limit(10).exec()
         else
             list = await VIDEOS.find({ released: req.params.date })
-                .skip((req.params.page - 1) * 10).sort({ update: -1 }).limit(10).exec()
+                .skip((page - 1) * 10).sort({ update: -1 }).limit(10).exec()
         res.send(list)
     })
 
@@ -126,14 +130,15 @@ module.exports = app => {
     // video area query
     ROUTER.get("/area/:area/:page", async (req, res) => {
         let list
-        if (req.params.page > 500) return res.status(204)
+        page = parseInt(req.params.page)
+        if (page > 500) return res.status(204)
             .send({ message: "Sorry!No content found in " + req.params.area + "!" })
-        if (req.params.page == 1)
+        if (page == 1)
             list = await VIDEOS.find({ area: req.params.area })
                 .skip(req.params.page).sort({ update: -1 }).limit(10).exec()
         else
             list = await VIDEOS.find({ area: req.params.area })
-                .skip((req.params.page - 1) * 10).sort({ update: -1 }).limit(10).exec()
+                .skip((page - 1) * 10).sort({ update: -1 }).limit(10).exec()
         res.send(list)
     })
 
@@ -146,21 +151,34 @@ module.exports = app => {
     })
 
     // video search
-    ROUTER.get("/search/:key", async (req, res) => {
+    ROUTER.get("/search/:key/:page", async (req, res) => {
         let reg = new RegExp(req.params.key, 'i')
-        let list = await VIDEOS.find({$or: [
-                { title: { $regex: reg } },
-                { actor: { $regex: reg } },
-                { alias: { $regex: reg } },
-                { area: { $regex: reg } },
-                { director: { $regex: reg } },
-                { released: { $regex: reg } },
-                { videotype: { $regex: reg } },
-            ]})
-        if (list.length == 0) return res.status
-            .sedn({ message: "Sorry!No result!"})
+        let list
+        page = parseInt(req.params.page)
+        if (page == 1)
+            list = await VIDEOS.find({$or: [
+                    { title: { $regex: reg } },
+                    { actor: { $regex: reg } },
+                    { alias: { $regex: reg } },
+                    { area: { $regex: reg } },
+                    { director: { $regex: reg } },
+                    { released: { $regex: reg } },
+                    { videotype: { $regex: reg } },
+                ]}).skip(page).limit(10)
+        else
+            list = await VIDEOS.find({$or: [
+                    { title: { $regex: reg } },
+                    { actor: { $regex: reg } },
+                    { alias: { $regex: reg } },
+                    { area: { $regex: reg } },
+                    { director: { $regex: reg } },
+                    { released: { $regex: reg } },
+                    { videotype: { $regex: reg } },
+                ]}).skip((page - 1) * 10).limit(10)
+        if (list.length == 0) return res.status(204)
+            .send({ message: "Sorry!No result!"})
         res.send(list)
     })
 
-    app.use("/video", ROUTER)
+    app.use("/", ROUTER)
 }

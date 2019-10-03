@@ -16,8 +16,8 @@ app.use((err, req, res, next) => {
     })
 })
 
-// listen 3000
-app.listen(3000, () => {
-    console.log("The App running 3000 port\n" +
-                "Please open: localhost:3000")
+// listen 3001
+app.listen(3001, () => {
+    console.log("The App running 3001 port\n" +
+                "Please open: localhost:3001")
 })
